@@ -25,6 +25,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void FireProjectile();
+
+	UFUNCTION(BlueprintCallable)
+	FRotator GetAimRotation();
 	
 	void ZoomIn();
 	void ZoomOut();

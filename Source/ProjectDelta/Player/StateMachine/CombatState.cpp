@@ -51,7 +51,7 @@ void UCombatState::Update(float DeltaTime)
 	{
 		if (STATE_MACHINE->Player->FireRateCurrent <= 0.f)
 		{
-			STATE_MACHINE->Player->FireGun();
+			STATE_MACHINE->Player->FireProjectile();
 			STATE_MACHINE->Player->FireRateCurrent = STATE_MACHINE->Player->FireRate;
 		}
 		else

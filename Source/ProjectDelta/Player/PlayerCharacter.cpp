@@ -34,10 +34,10 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	DrawDebugLine(GetWorld(), GetMesh()->GetSocketLocation("Muzzle_01"),
-	              GetMesh()->GetSocketLocation("Muzzle_01") + GetMesh()->GetSocketTransform("Muzzle_01").GetRotation().GetForwardVector() +
-	              10000.f, FColor::Red);
+	//
+	// DrawDebugLine(GetWorld(), GetMesh()->GetSocketLocation("Muzzle_01"),
+	//               GetMesh()->GetSocketLocation("Muzzle_01") + GetMesh()->GetSocketTransform("Muzzle_01").GetRotation().GetForwardVector() +
+	//               10000.f, FColor::Red);
 }
 
 void APlayerCharacter::MoveForward(float AxisValue)
@@ -91,7 +91,15 @@ void APlayerCharacter::FireGun()
 
 void APlayerCharacter::FireProjectile()
 {
-	//Get Vieport Location and Rotation
+	//Check for Particles and spawn them
+	if (!MuzzleFlash)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No muzzle particle in Player"));
+		return;
+	}
+	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GetMesh(), TEXT("Muzzle_01"));
+	
+	//Get Viewport Location and Rotation
 	if (!GetController()) { return; }
 	FVector Location;
 	FRotator Rotation;
@@ -112,6 +120,30 @@ void APlayerCharacter::FireProjectile()
 
 	// FVector Direction = GetActorForwardVector() + NewProjectile->GetActorLocation()
 	NewProjectile->Init(SpawnRotation.Vector());
+}
+
+FRotator APlayerCharacter::GetAimRotation()
+{
+	FRotator AimRotation(0, 0, 0);
+	if (!GetController()) { return AimRotation; }
+
+	FVector Location;
+	FRotator Rotation;
+	GetController()->GetPlayerViewPoint(Location, Rotation);
+
+	FHitResult Hit;
+	const FVector End = Location + Rotation.Vector() * 10000.f;
+	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECC_GameTraceChannel1);
+
+	FVector AimVector = End - GetMesh()->GetSocketLocation("Weapon_R");
+
+	if (bSuccess)
+	{
+		AimVector = Hit.Location - GetMesh()->GetSocketLocation("Weapon_R");
+	}
+	AimVector.Normalize();
+	
+	return AimRotation = AimVector.Rotation();
 }
 
 void APlayerCharacter::ZoomIn()

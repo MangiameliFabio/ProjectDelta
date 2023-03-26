@@ -25,7 +25,7 @@ protected:
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	UNiagaraComponent* ProjectileTrail = nullptr;
+	USceneComponent* Root = nullptr;
 
 	FVector FlightDirection = FVector::Zero();
 
