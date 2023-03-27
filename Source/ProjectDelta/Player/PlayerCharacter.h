@@ -21,14 +21,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void FireGun();
-	
 	UFUNCTION(BlueprintCallable)
 	void FireProjectile();
 
 	UFUNCTION(BlueprintCallable)
 	FRotator GetAimRotation();
-	
+
+	bool GetPointedHit(FHitResult& Hit, FVector& Location, FRotator& Rotation);
+
 	void ZoomIn();
 	void ZoomOut();
 
@@ -46,7 +46,7 @@ private:
 public:
 	UPROPERTY(EditAnywhere)
 	USpringArmComponent* SpringArm = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category="Combat Stats")
 	float FireRate = 0.5f;
 	UPROPERTY(EditAnywhere, Category="Combat Stats")
@@ -68,7 +68,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UPlayerStateMachine* StateMachine = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly,Category="Projectile")
+
+	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	TSubclassOf<ARifleProjectile> RifleProjectile;
 };

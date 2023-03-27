@@ -30,4 +30,9 @@ public:
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s %s"), *Message, *ActorToLog.GetActorNameOrLabel());
 	}
+
+	static void Print(const FString StringToLog)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *StringToLog);
+	}
 };

@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ProjectDelta/Log.h"
 #include "ProjectDelta/BaseClasses/State.h"
 #include "ProjectDelta/Environment/RifleProjectile.h"
 #include "StateMachine/PlayerStateMachine.h"
@@ -58,37 +59,6 @@ void APlayerCharacter::MoveRight(float AxisValue)
 	AddMovementInput(RightVector, AxisValue);
 }
 
-void APlayerCharacter::FireGun()
-{
-	//Check for Particles and spawn them
-	if (!MuzzleFlash)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No muzzle particle in Player"));
-		return;
-	}
-	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GetMesh(), TEXT("Muzzle_01"));
-
-	//Get Vieport Location and Rotation
-	if (!GetController()) { return; }
-	FVector Location;
-	FRotator Rotation;
-	GetController()->GetPlayerViewPoint(Location, Rotation);
-
-	FHitResult Hit;
-	const FVector End = Location + Rotation.Vector() * 100000.f;
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECC_GameTraceChannel1);
-
-	if (bSuccess)
-	{
-		if (!HitEffect)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No HitEffect particle in Player"));
-			return;
-		}
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, Hit.Location);
-	}
-}
-
 void APlayerCharacter::FireProjectile()
 {
 	//Check for Particles and spawn them
@@ -98,16 +68,6 @@ void APlayerCharacter::FireProjectile()
 		return;
 	}
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GetMesh(), TEXT("Muzzle_01"));
-	
-	//Get Viewport Location and Rotation
-	if (!GetController()) { return; }
-	FVector Location;
-	FRotator Rotation;
-	GetController()->GetPlayerViewPoint(Location, Rotation);
-
-	FHitResult Hit;
-	const FVector End = Location + Rotation.Vector() * 100000.f;
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECC_GameTraceChannel1);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -118,7 +78,6 @@ void APlayerCharacter::FireProjectile()
 	ARifleProjectile* NewProjectile = GetWorld()->SpawnActor<ARifleProjectile>(
 		RifleProjectile, SpawnLocation, SpawnRotation, SpawnParams);
 
-	// FVector Direction = GetActorForwardVector() + NewProjectile->GetActorLocation()
 	NewProjectile->Init(SpawnRotation.Vector());
 }
 
@@ -132,18 +91,26 @@ FRotator APlayerCharacter::GetAimRotation()
 	GetController()->GetPlayerViewPoint(Location, Rotation);
 
 	FHitResult Hit;
-	const FVector End = Location + Rotation.Vector() * 10000.f;
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECC_GameTraceChannel1);
 
-	FVector AimVector = End - GetMesh()->GetSocketLocation("Weapon_R");
+	FVector AimVector = Location + Rotation.Vector() * 100000.f - GetMesh()->GetSocketLocation("Weapon_R");
 
-	if (bSuccess)
+	if (GetPointedHit(Hit, Location, Rotation))
 	{
 		AimVector = Hit.Location - GetMesh()->GetSocketLocation("Weapon_R");
 	}
 	AimVector.Normalize();
-	
+
 	return AimRotation = AimVector.Rotation();
+}
+
+bool APlayerCharacter::GetPointedHit(FHitResult& Hit, FVector& Location, FRotator& Rotation)
+{
+	// Set up the trace parameters
+	FCollisionQueryParams TraceParams(FName(TEXT("MyTrace")), true, this);
+
+	const FVector End = Location + Rotation.Vector() * 100000.f;
+	
+	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECC_GameTraceChannel2, TraceParams);
 }
 
 void APlayerCharacter::ZoomIn()

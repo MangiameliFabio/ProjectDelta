@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "RifleProjectile.generated.h"
 
+class USphereComponent;
 UCLASS()
 class PROJECTDELTA_API ARifleProjectile : public AActor
 {
@@ -23,9 +24,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+private:
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 public:
 	UPROPERTY(EditDefaultsOnly)
-	USceneComponent* Root = nullptr;
+	USphereComponent* CollisionSphere = nullptr;
+	UPROPERTY(EditDefaultsOnly)
+	UParticleSystemComponent* ProjectileTrail = nullptr;
+	UPROPERTY(EditDefaultsOnly)
+	UParticleSystem* HitWorldEffect = nullptr;
 
 	FVector FlightDirection = FVector::Zero();
 
