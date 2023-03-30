@@ -72,3 +72,11 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+Content\ParagonProps\Agora\Rocks\Textures\T_LargePlainsBoulder002_D.uasset
+Content\ParagonProps\Agora\Rocks\Textures\T_HadriansWall_D_Colored.uasset
+Content\ParagonProps\Agora\Rocks\Textures\T_Agelsjon02_Cliff_D.uasset
+Content\KiteDemo\Environments\Rocks\Mountain_RockFace_002\T_MountainRock_Closed_D2.uasset
+Content\KiteDemo\Environments\Rocks\Mountain_RockFace_002\T_MountainRock_Closed_N.uasset
+Content\KiteDemo\Environments\GroundTiles\RockyPath\T_GDC_StonePath_Tile_N.uasset
+Content\KiteDemo\Environments\GroundTiles\RockyPath\T_GDC_StonePath_Tile_D_R.uasset
